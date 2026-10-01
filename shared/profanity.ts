@@ -1,7 +1,7 @@
 const BLOCKED_WORDS = [
   'abbo', 'ass', 'asshole', 'bastard', 'bitch', 'cunt', 'dick', 'fag', 'fuck',
-  'motherfucker', 'nazi', 'nigger', 'piss', 'porn', 'rape', 'shit', 'slut',
-  'whore'
+  'motherfucker', 'nazi', 'nigger', 'nudes', 'porn', 'rape', 'retard', 'sex',
+  'shit', 'slut', 'terrorist', 'whore', 'xxx', 'killyourself'
 ];
 
 const LEET_MAP: Record<string, string> = { '@': 'a', '4': 'a', '3': 'e', '1': 'i', '!': 'i', '0': 'o', '$': 's', '5': 's', '7': 't' };
@@ -12,8 +12,9 @@ export function normalizeNickname(input: string): string {
   return input
     .normalize('NFKC')
     .toLowerCase()
-    .replace(/[ @\-_\.]/g, '')
-    .split('').map((character) => LEET_MAP[character] ?? character).join('');
+    .split('').map((character) => LEET_MAP[character] ?? character).join('')
+    .replace(/[\s_\-.]/g, '')
+    .replace(/(.)\1+/g, '$1');
 }
 
 export function validateNickname(input: string): { ok: true; value: string } | { ok: false; error: string } {
