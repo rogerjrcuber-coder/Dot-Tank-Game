@@ -2,6 +2,8 @@
 
 Real-time multiplayer tank arena built for a Railway Socket.IO server and a Sites-hosted frontend.
 
+Prototype v0.0.2 adds dense-fill matchmaking, server-authoritative projectile combat, dash momentum, bump damage, ring-out eliminations, utility-based bot personalities, a kill feed, and a full pixel-art rendering pass.
+
 ## Local development
 
 ```bash
@@ -11,7 +13,7 @@ npm run dev
 
 Open `http://localhost:5173`. The game server runs on `http://localhost:3001`.
 
-Set `VITE_SERVER_URL` for a deployed client. Set `PUBLIC_ORIGIN` on Railway to a comma-separated list of allowed origins, for example `https://one-more-relic-game.r-m2016.chatgpt.site,https://one-more-relic-production.up.railway.app`.
+Set `VITE_SERVER_URL` for a deployed client. Set `PUBLIC_ORIGIN` on Railway to a comma-separated list of allowed origins, for example `https://dot-tank-arena.r-m2016.chatgpt.site,https://dot-tank-game-production.up.railway.app`.
 
 Nicknames are validated on both sides using the shared profanity filter in `shared/profanity.ts`.
 
@@ -20,6 +22,6 @@ Nicknames are validated on both sides using the shared profanity filter in `shar
 - Local frontend: `http://localhost:5173`
 - Local Socket.IO server: `http://localhost:3001`
 - Railway health check after deployment: `https://YOUR-RAILWAY-DOMAIN/health`
-- Sites URL after publishing: supplied by Sites after deployment
+- Sites URL: `https://dot-tank-arena.r-m2016.chatgpt.site`
 
 Set Railway's `PUBLIC_ORIGIN` to the allowed comma-separated origins, then set the Sites build variable `VITE_SERVER_URL` to the tank service's Railway domain without `/health`.
