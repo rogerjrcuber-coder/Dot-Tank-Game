@@ -6,7 +6,7 @@ import { validateNickname } from '../shared/profanity.ts';
 import type { ArenaId, ArenaSnapshot, BotPersonality, BulletSnapshot, ClientToServerEvents, DotSnapshot, EnvironmentSnapshot, KillFeedItem, ObjectiveSnapshot, PlayerColor, PlayerInput, PlayerSnapshot, PowerUpKind, PowerUpSnapshot, RegionSnapshot, ServerToClientEvents } from '../shared/types.ts';
 
 const PORT = Number(process.env.PORT ?? 3001);
-const ARENA_COUNT = 1;
+const ARENA_COUNT = 3;
 const MAX_HUMANS = Number(process.env.MAX_HUMANS ?? 15);
 const BOT_COUNT = Number(process.env.BOT_COUNT ?? 6);
 const WIDTH = 6000;
