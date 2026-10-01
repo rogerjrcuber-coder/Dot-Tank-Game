@@ -7,7 +7,7 @@ import type { ArenaId, ArenaSnapshot, BotPersonality, BulletSnapshot, ClientToSe
 
 const PORT = Number(process.env.PORT ?? 3001);
 const ARENA_COUNT = 1;
-const MAX_HUMANS = Number(process.env.MAX_HUMANS ?? 30);
+const MAX_HUMANS = Number(process.env.MAX_HUMANS ?? 10);
 const BOT_COUNT = Number(process.env.BOT_COUNT ?? 12);
 const WIDTH = 6000;
 const HEIGHT = 3800;
