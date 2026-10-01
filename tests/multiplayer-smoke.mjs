@@ -12,9 +12,9 @@ for (const [index, client] of clients.entries()) {
     if (verified || sessions.length < 2 || !sessions.every(Boolean)) return;
     const first = snapshot.players.find((player) => player.id === sessions[0].playerId);
     const second = snapshot.players.find((player) => player.id === sessions[1].playerId);
-    if (!first || !second || sessions[0].arenaId !== sessions[1].arenaId || first.dashCooldown <= 0) return;
+    if (!first || !second || sessions[0].arenaId !== sessions[1].arenaId || first.dashCooldown <= 0 || snapshot.width < 3300 || snapshot.environment.length < 20) return;
     verified = true;
-    console.log(JSON.stringify({ ok: true, arenaId: sessions[0].arenaId, humansVisible: [first.name, second.name], dashCooldown: first.dashCooldown, bots: snapshot.bots }));
+    console.log(JSON.stringify({ ok: true, arenaId: sessions[0].arenaId, humansVisible: [first.name, second.name], dashCooldown: first.dashCooldown, bots: snapshot.bots, arena: `${snapshot.width}x${snapshot.height}`, coverObjects: snapshot.environment.length }));
     for (const socket of clients) socket.disconnect();
     process.exit(0);
   });

@@ -2,7 +2,7 @@
 
 Real-time multiplayer tank arena built for a Railway Socket.IO server and a Sites-hosted frontend.
 
-Prototype v0.0.2 adds dense-fill matchmaking, server-authoritative projectile combat, dash momentum, bump damage, ring-out eliminations, utility-based bot personalities, a kill feed, and a full pixel-art rendering pass.
+Prototype v0.0.3 adds a larger backyard battlefield, physical toy cover, concealment bushes, terrain patches, a pixel minimap, stagger-producing dash impacts, dot healing, humanized bot aim, dual mobile sticks, and five-minute sandcastle events with temporary power-ups.
 
 ## Local development
 
