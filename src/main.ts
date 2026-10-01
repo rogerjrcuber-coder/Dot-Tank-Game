@@ -6,11 +6,11 @@ import './style.css';
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const colors: PlayerColor[] = ['pink', 'cyan', 'lime', 'orange', 'violet', 'yellow'];
 const colorValues: Record<PlayerColor, string> = { pink: '#ff4fa3', cyan: '#4de8e8', lime: '#b8f34a', orange: '#ff914d', violet: '#ad7aff', yellow: '#ffd85c' };
-const storedToken = sessionStorage.getItem('dot-tank-token') ?? '';
 const storedName = sessionStorage.getItem('dot-tank-name') ?? '';
 const storedColor = (sessionStorage.getItem('dot-tank-color') as PlayerColor | null) ?? 'pink';
+sessionStorage.removeItem('dot-tank-token');
 const input: PlayerInput = { up: false, down: false, left: false, right: false, firing: false, dash: false, angle: 0 };
-const state = { socket: null as Socket | null, snapshot: null as ArenaSnapshot | null, playerId: '', token: storedToken, connected: false, input };
+const state = { socket: null as Socket | null, snapshot: null as ArenaSnapshot | null, playerId: '', token: '', connected: false, input };
 type Particle = { x: number; y: number; vx: number; vy: number; life: number; color: string; size: number };
 const particles: Particle[] = [];
 const previousHealth = new Map<string, number>();
@@ -35,9 +35,9 @@ function connect(name: string) {
   state.socket?.disconnect(); state.socket = io(serverUrl, { transports: ['websocket', 'polling'], reconnection: true });
   state.socket.on('connect', () => { state.connected = true; errorElement.textContent = ''; if (state.token) state.socket!.emit('player:reconnect', { token: state.token }); else state.socket!.emit('queue:join', { name, color: selectedColor }); });
   state.socket.on('connect_error', () => { errorElement.textContent = 'ARENA SERVER UNREACHABLE. RETRYING...'; });
-  state.socket.on('session:ready', (data) => { state.token = data.token; state.playerId = data.playerId; sessionStorage.setItem('dot-tank-token', data.token); document.querySelector('#lobby')!.classList.add('hidden'); document.querySelector('#game')!.classList.remove('hidden'); });
+  state.socket.on('session:ready', (data) => { state.token = data.token; state.playerId = data.playerId; document.querySelector('#lobby')!.classList.add('hidden'); document.querySelector('#game')!.classList.remove('hidden'); });
   state.socket.on('arena:state', (snapshot: ArenaSnapshot) => { createDamageParticles(snapshot); state.snapshot = snapshot; renderHud(); });
-  state.socket.on('player:error', (data) => { if (state.token && data.message.includes('expired')) { state.token = ''; sessionStorage.removeItem('dot-tank-token'); state.socket!.emit('queue:join', { name, color: selectedColor }); return; } errorElement.textContent = data.message; });
+  state.socket.on('player:error', (data) => { if (state.token && data.message.includes('expired')) { state.token = ''; state.socket!.emit('queue:join', { name, color: selectedColor }); return; } errorElement.textContent = data.message; });
   state.socket.on('disconnect', () => { state.connected = false; showToast('CONNECTION LOST // RECONNECTING'); });
 }
 
@@ -86,15 +86,15 @@ function draw() {
 }
 
 function drawArena(snapshot: ArenaSnapshot) {
-  context.fillStyle = '#111a24'; context.fillRect(0, 0, snapshot.width, snapshot.height);
-  for (let y = 0; y < snapshot.height; y += 32) for (let x = 0; x < snapshot.width; x += 32) { const inside = x >= snapshot.boundary && x < snapshot.width - snapshot.boundary && y >= snapshot.boundary && y < snapshot.height - snapshot.boundary; context.fillStyle = inside ? ((x / 32 + y / 32) % 2 ? '#172331' : '#14202c') : ((x / 32 + y / 32) % 2 ? '#281329' : '#1e1022'); context.fillRect(x, y, 32, 32); if (inside && (x + y) % 128 === 0) { context.fillStyle = '#213344'; context.fillRect(x + 5, y + 7, 4, 4); context.fillRect(x + 22, y + 19, 3, 3); } }
-  context.fillStyle = '#ff4fa3'; context.fillRect(snapshot.boundary - 6, snapshot.boundary - 6, snapshot.width - snapshot.boundary * 2 + 12, 6); context.fillRect(snapshot.boundary - 6, snapshot.height - snapshot.boundary, snapshot.width - snapshot.boundary * 2 + 12, 6); context.fillRect(snapshot.boundary - 6, snapshot.boundary, 6, snapshot.height - snapshot.boundary * 2); context.fillRect(snapshot.width - snapshot.boundary, snapshot.boundary, 6, snapshot.height - snapshot.boundary * 2);
-  context.fillStyle = '#7a245a'; for (let x = snapshot.boundary; x < snapshot.width - snapshot.boundary; x += 24) { context.fillRect(x, snapshot.boundary - 12, 12, 6); context.fillRect(x + 12, snapshot.height - snapshot.boundary + 6, 12, 6); }
+  context.fillStyle = '#3b7437'; context.fillRect(0, 0, snapshot.width, snapshot.height);
+  for (let y = 0; y < snapshot.height; y += 32) for (let x = 0; x < snapshot.width; x += 32) { const inside = x >= snapshot.boundary && x < snapshot.width - snapshot.boundary && y >= snapshot.boundary && y < snapshot.height - snapshot.boundary; context.fillStyle = inside ? ((x / 32 + y / 32) % 2 ? '#63a84f' : '#589b48') : ((x / 32 + y / 32) % 2 ? '#315e34' : '#294f2f'); context.fillRect(x, y, 32, 32); if (inside && (x + y) % 128 === 0) { context.fillStyle = '#83c85e'; context.fillRect(x + 5, y + 7, 3, 7); context.fillRect(x + 22, y + 19, 3, 6); context.fillStyle = '#3d823c'; context.fillRect(x + 9, y + 22, 5, 3); } }
+  context.fillStyle = '#704728'; context.fillRect(snapshot.boundary - 9, snapshot.boundary - 9, snapshot.width - snapshot.boundary * 2 + 18, 9); context.fillRect(snapshot.boundary - 9, snapshot.height - snapshot.boundary, snapshot.width - snapshot.boundary * 2 + 18, 9); context.fillRect(snapshot.boundary - 9, snapshot.boundary, 9, snapshot.height - snapshot.boundary * 2); context.fillRect(snapshot.width - snapshot.boundary, snapshot.boundary, 9, snapshot.height - snapshot.boundary * 2);
+  context.fillStyle = '#c58a45'; for (let x = snapshot.boundary; x < snapshot.width - snapshot.boundary; x += 28) { context.fillRect(x, snapshot.boundary - 15, 14, 7); context.fillRect(x + 14, snapshot.height - snapshot.boundary + 9, 14, 7); }
 }
 
 function drawDot(x: number, y: number) { context.fillStyle = '#9b6e22'; context.fillRect(Math.round(x) - 7, Math.round(y) - 7, 14, 14); context.fillStyle = '#ffd85c'; context.fillRect(Math.round(x) - 5, Math.round(y) - 5, 10, 10); context.fillStyle = '#fff3a6'; context.fillRect(Math.round(x) - 3, Math.round(y) - 3, 4, 4); }
 function drawEnvironment(item: ArenaSnapshot['environment'][number]) {
-  const palettes = { brick: ['#d94868','#8f2748'], rock: ['#8992a2','#525d70'], branch: ['#83552f','#4f331f'], bush: ['#4d8b45','#285e38'], flower: ['#f2ec8b','#4b853b'], dirt: ['#815b3c','#68452e'], gravel: ['#7d8188','#5e636c'] } as const; const palette = palettes[item.kind];
+  const palettes = { brick: ['#f06b72','#a83b50'], rock: ['#b2b7bf','#707886'], branch: ['#a96f36','#65401f'], bush: ['#38a84e','#176b37'], flower: ['#ffef75','#4d9b43'], dirt: ['#b77a43','#8d5830'], gravel: ['#b4aca0','#807a72'] } as const; const palette = palettes[item.kind];
   context.fillStyle = palette[1]; context.fillRect(item.x, item.y, item.width, item.height); context.fillStyle = palette[0];
   if (item.kind === 'bush') { for (let y = 6; y < item.height; y += 18) for (let x = 5 + (y % 36); x < item.width; x += 28) context.fillRect(item.x + x, item.y + y, 18, 14); }
   else if (item.kind === 'flower' || item.kind === 'gravel' || item.kind === 'dirt') { for (let y = 8; y < item.height; y += 18) for (let x = 8; x < item.width; x += 22) context.fillRect(item.x + x, item.y + y, item.kind === 'flower' ? 5 : 7, item.kind === 'flower' ? 5 : 4); }
@@ -130,5 +130,3 @@ aimStick.addEventListener('touchmove', (event) => { const touch = event.touches[
 fire.addEventListener('pointerdown', () => { state.input.firing = true; }); fire.addEventListener('pointerup', () => { state.input.firing = false; });
 dash.addEventListener('pointerdown', () => { state.input.dash = true; }); dash.addEventListener('pointerup', () => { state.input.dash = false; });
 window.setInterval(() => { if (state.connected) state.socket?.emit('player:input', state.input); }, 50);
-
-if (storedToken && storedName) connect(storedName);
