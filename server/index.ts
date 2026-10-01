@@ -155,7 +155,7 @@ io.on('connection', (socket) => {
   });
   socket.on('player:input', (input) => {
     const player = findPlayer(socket.id); if (!player) return;
-    player.input = { up: Boolean(input.up), down: Boolean(input.down), left: Boolean(input.left), right: Boolean(input.right), firing: Boolean(input.firing), dash: Boolean(input.dash), angle: Number.isFinite(input.angle) ? input.angle : player.angle };
+    player.input = { up: Boolean(input.up), down: Boolean(input.down), left: Boolean(input.left), right: Boolean(input.right), firing: Boolean(input.firing), dash: Boolean(input.dash), angle: Number.isFinite(input.angle) ? normalizeAngle(input.angle) : player.angle };
   });
   socket.on('queue:leave', () => removePlayer(socket.id));
   socket.on('disconnect', () => { const player = findPlayer(socket.id); if (player) { player.socketId = undefined; player.disconnectAt = Date.now(); player.connected = false; } });
@@ -264,7 +264,8 @@ function updateObjective(arena: Arena, now: number) {
 }
 
 function pointInside(point: { x: number; y: number }, item: EnvironmentSnapshot) { return point.x >= item.x && point.x <= item.x + item.width && point.y >= item.y && point.y <= item.y + item.height; }
-function turnToward(current: number, target: number, maximumStep: number) { const difference = Math.atan2(Math.sin(target - current), Math.cos(target - current)); return current + Math.max(-maximumStep, Math.min(maximumStep, difference)); }
+function normalizeAngle(angle: number) { return Math.atan2(Math.sin(angle), Math.cos(angle)); }
+function turnToward(current: number, target: number, maximumStep: number) { const difference = Math.atan2(Math.sin(target - current), Math.cos(target - current)); return normalizeAngle(current + Math.max(-maximumStep, Math.min(maximumStep, difference))); }
 function staggerDuration(momentum: number, target: Player) { const base = momentum > 34 ? 600 : momentum > 24 ? 400 : 250; return base * (target.powerUp === 'shocks' ? .65 : 1); }
 function distance(first: { x: number; y: number }, second: { x: number; y: number }) { return Math.hypot(first.x - second.x, first.y - second.y); }
 function angleDistance(first: number, second: number) { return Math.abs(Math.atan2(Math.sin(first - second), Math.cos(first - second))); }
