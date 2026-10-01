@@ -229,7 +229,7 @@ function updatePlayer(player: Player, arena: Arena, now: number) {
 }
 
 function fire(player: Player, arena: Arena) {
-  player.fireCooldown = Math.max(240 - (player.level - 1) * 8, 158) * (player.powerUp === 'batteries' ? .9 : 1);
+  player.fireCooldown = Math.max(280 - (player.level - 1) * 8, 200) * (player.powerUp === 'batteries' ? .9 : 1);
   player.revealedUntil = Date.now() + 700; player.concealed = false;
   const speed = 18; arena.bullets.push({ id: randomUUID(), ownerId: player.id, x: player.x + Math.cos(player.angle) * 30, y: player.y + Math.sin(player.angle) * 30, vx: Math.cos(player.angle) * speed, vy: Math.sin(player.angle) * speed, angle: player.angle, color: player.color, ttl: 950, damage: 18 });
   if (player.isBot) player.input.firing = false;
