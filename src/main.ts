@@ -20,25 +20,13 @@ const previousHealth = new Map<string, number>();
 
 app.innerHTML = `<main class="shell"><section id="lobby" class="lobby"><div class="panel"><div class="eyebrow">DOT TANK ARENA <span class="live-dot"></span> ONLINE</div><h1>BACKYARD<br><span>BLITZ</span></h1><p class="lede">Pocket-sized armor. Backyard-sized battles. Collect dots, build your tank, and rule the lawn.</p><div class="form-row"><label>CALLSIGN<input id="name" maxlength="16" placeholder="PICK A CALLSIGN" autocomplete="off"></label><label>COLOR<div id="colors" class="color-picker"></div></label></div><button id="play" class="primary">DEPLOY TANK <span>&gt;&gt;</span></button><p id="error" class="error"></p><div class="rules"><div><strong>WASD</strong><span>MOVE</span></div><div><strong>MOUSE</strong><span>AIM + FIRE</span></div><div><strong>SPACE</strong><span>DASH / BUMP</span></div></div></div><div class="hero-art" aria-hidden="true"><div class="sun-pixel"></div><svg class="iso-tank" viewBox="0 0 640 500" role="img"><g shape-rendering="crispEdges"><path class="tank-shadow" d="M112 340 300 245 530 335 337 438Z"/><path class="track-left" d="M120 286 292 205 292 296 120 379Z"/><path class="track-right" d="M292 296 520 373 520 292 292 205Z"/><path class="track-top" d="M120 286 292 205 520 292 345 374Z"/><path class="body-left" d="M168 239 310 171 310 275 168 341Z"/><path class="body-right" d="M310 275 470 329 470 226 310 171Z"/><path class="body-top" d="M168 239 310 171 470 226 326 294Z"/><path class="turret-left" d="M248 172 329 133 329 206 248 245Z"/><path class="turret-right" d="M329 206 410 232 410 160 329 133Z"/><path class="turret-top" d="M248 172 329 133 410 160 329 201Z"/><path class="barrel-side" d="M389 156 502 101 526 111 410 169Z"/><path class="barrel-top" d="M381 146 494 92 526 103 410 160Z"/><path class="hatch" d="M292 144 330 125 370 139 331 158Z"/><path class="track-mark" d="M137 300 275 235 275 250 137 316ZM137 332 275 267 275 282 137 348ZM315 316 497 378 497 360 315 299Z"/><path class="shine" d="M197 238 307 186 375 209 264 261Z"/></g></svg><div class="hero-copy"><b>FIVE ARENAS</b><span>ONE TINY WAR</span></div></div></section><section id="game" class="game hidden"><canvas id="arena"></canvas><div class="hud"><div class="hud-left"><div class="brand">DOT TANK <span>LIVE</span></div><div id="dash-meter" class="dash-meter"><b>DASH</b><i></i></div><div id="power" class="power"></div><div id="event" class="event"></div><div id="warning" class="warning"></div><canvas id="minimap" class="minimap" width="180" height="116"></canvas></div><div id="status" class="status">CONNECTING</div><div><div id="leaderboard" class="leaderboard"></div><div id="kill-feed" class="kill-feed"></div></div></div><div class="mobile-controls"><div id="stick" class="stick" aria-label="Move"><i></i></div><div id="aim-stick" class="aim-stick" aria-label="Aim"><i></i></div><button id="dash" class="dash">DASH</button><div class="auto-fire">AUTO FIRE</div></div><div id="respawn" class="respawn hidden"></div><div id="toast" class="toast"></div></section></main>`;
 
-const titleTank = document.querySelector<SVGSVGElement>('.iso-tank')!;
-titleTank.innerHTML = `<g shape-rendering="crispEdges">
-  <path class="tank-shadow" d="M82 350 304 236 559 321 333 446Z"/>
-  <path class="track-left" d="M112 295 337 370 337 427 112 345Z"/>
-  <path class="track-right" d="M337 370 536 279 536 337 337 427Z"/>
-  <path class="track-top" d="M112 295 305 208 536 279 337 370Z"/>
-  <path class="wheel" d="M143 327 179 339 179 372 143 359ZM195 345 231 357 231 390 195 377ZM247 363 283 375 283 407 247 395ZM371 367 405 351 405 385 371 401ZM422 344 456 328 456 362 422 378ZM473 320 507 304 507 338 473 354Z"/>
-  <path class="body-left" d="M132 255 340 323 340 379 132 306Z"/>
-  <path class="body-right" d="M340 323 514 244 514 300 340 379Z"/>
-  <path class="body-top" d="M132 255 304 178 514 244 340 323Z"/>
-  <path class="barrel-side" d="M80 239 265 184 286 198 102 260 80 253Z"/>
-  <path class="barrel-top" d="M80 226 265 171 286 184 102 246 80 239Z"/>
-  <path class="turret-left" d="M225 170 339 207 339 259 225 220Z"/>
-  <path class="turret-right" d="M339 207 448 158 448 209 339 259Z"/>
-  <path class="turret-top" d="M225 170 332 123 448 158 339 207Z"/>
-  <path class="hatch" d="M282 125 338 101 397 119 339 145Z"/>
-  <path class="shine" d="M159 248 301 185 423 223 280 288Z"/>
-  <path class="track-mark" d="M123 310 325 378 325 390 123 319ZM353 377 520 301 520 313 353 390Z"/>
-</g>`;
+const oldTitleTank = document.querySelector<SVGSVGElement>('.iso-tank')!;
+const titleTank = document.createElement('img');
+titleTank.className = 'title-tank';
+titleTank.src = '/title-tank-v2.png';
+titleTank.alt = '';
+titleTank.decoding = 'async';
+oldTitleTank.replaceWith(titleTank);
 document.querySelector('.hero-copy b')!.textContent = 'ONE WORLD';
 document.querySelector('.hero-copy span')!.textContent = 'FIVE REGIONS';
 

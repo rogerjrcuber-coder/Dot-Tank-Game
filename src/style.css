@@ -31,8 +31,7 @@ input:focus { border-color:var(--cyan); }
 .hero-art::before,.hero-art::after { content:""; position:absolute; background:#167635; box-shadow:54px 24px 0 #167635,92px -12px 0 #167635; width:70px; height:70px; }
 .hero-art::before { left:8%; top:14%; } .hero-art::after { right:16%; bottom:18%; }
 .sun-pixel { position:absolute; top:9%; right:10%; width:82px; height:82px; background:#b0ed13; box-shadow:12px 0 #b0ed13,0 12px #b0ed13,12px 12px #b0ed13; }
-.iso-tank { width:min(92%,720px); position:relative; z-index:2; filter:drop-shadow(18px 20px 0 var(--green-shadow)); }
-.tank-shadow { fill:var(--green-shadow); }.track-left{fill:#000}.track-right{fill:var(--brown-shadow)}.track-top{fill:#7195be}.wheel{fill:#aaa}.body-left{fill:var(--red-deep)}.body-right{fill:#f1444d}.body-top,.turret-top{fill:#f91b24}.turret-left{fill:#980019}.turret-right{fill:var(--red-shadow)}.barrel-side{fill:#734b36}.barrel-top{fill:#f91b24}.hatch{fill:#f3e4ad}.track-mark{fill:var(--tan-shadow)}.shine{fill:#f1444d}
+.title-tank { width:min(88%,760px); max-height:72vh; object-fit:contain; position:relative; z-index:2; filter:drop-shadow(18px 20px 0 var(--green-shadow)); }
 .hero-copy { position:absolute; z-index:3; bottom:9%; right:8%; display:grid; gap:10px; padding:13px; color:#000; background:#f3e4ad; border:4px solid #734b36; box-shadow:8px 8px 0 #980019; font-size:9px; }.hero-copy span{font-size:7px;color:#980019}
 .game { width:100vw; height:100vh; position:relative; background:#000; } #arena { position:absolute; inset:0; width:100%; height:100%; }
 .hud { position:absolute; inset:0; pointer-events:none; padding:20px; display:flex; justify-content:space-between; align-items:flex-start; gap:18px; }
