@@ -11,7 +11,7 @@ npm run dev
 
 Open `http://localhost:5173`. The game server runs on `http://localhost:3001`.
 
-Set `VITE_SERVER_URL` for a deployed client. Set `CLIENT_ORIGIN` on Railway to the Sites URL (comma-separated origins are supported).
+Set `VITE_SERVER_URL` for a deployed client. Set `PUBLIC_ORIGIN` on Railway to a comma-separated list of allowed origins, for example `https://one-more-relic-game.r-m2016.chatgpt.site,https://one-more-relic-production.up.railway.app`.
 
 Nicknames are validated on both sides using the shared profanity filter in `shared/profanity.ts`.
 
@@ -22,4 +22,4 @@ Nicknames are validated on both sides using the shared profanity filter in `shar
 - Railway health check after deployment: `https://YOUR-RAILWAY-DOMAIN/health`
 - Sites URL after publishing: supplied by Sites after deployment
 
-Set Railway's `CLIENT_ORIGIN` to the exact Sites URL, then set the Sites build variable `VITE_SERVER_URL` to the Railway domain without `/health`.
+Set Railway's `PUBLIC_ORIGIN` to the allowed comma-separated origins, then set the Sites build variable `VITE_SERVER_URL` to the tank service's Railway domain without `/health`.

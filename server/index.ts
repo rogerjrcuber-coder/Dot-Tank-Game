@@ -43,7 +43,8 @@ function respawn(player: Player, arena: Arena) { const point = spawn(arena); pla
 const app = express();
 app.get('/health', (_req, res) => res.json({ ok: true, arenas: ARENA_COUNT }));
 const httpServer = createServer(app);
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, { cors: { origin: process.env.CLIENT_ORIGIN?.split(',') ?? '*', methods: ['GET', 'POST'] } });
+const configuredOrigins = process.env.PUBLIC_ORIGIN ?? process.env.CLIENT_ORIGIN;
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, { cors: { origin: configuredOrigins?.split(',').map((origin) => origin.trim()) ?? '*', methods: ['GET', 'POST'] } });
 
 io.on('connection', (socket) => {
   socket.on('queue:join', ({ name, color }) => {
