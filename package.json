@@ -7,7 +7,7 @@
     "dev": "concurrently \"vite\" \"tsx server/index.ts\"",
     "dev:client": "vite",
     "dev:server": "tsx server/index.ts",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && esbuild site-worker.ts --bundle --platform=neutral --format=esm --outfile=dist/server/index.js",
     "start:server": "tsx server/index.ts",
     "preview": "vite preview"
   },
@@ -21,6 +21,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
     "concurrently": "^9.1.2",
+    "esbuild": "^0.25.12",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vite": "^6.0.5"
