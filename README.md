@@ -2,7 +2,7 @@
 
 Real-time multiplayer tank arena built for a Railway Socket.IO server and a Sites-hosted frontend.
 
-Prototype v0.0.3 adds a larger backyard battlefield, physical toy cover, concealment bushes, terrain patches, a pixel minimap, stagger-producing dash impacts, dot healing, humanized bot aim, dual mobile sticks, and five-minute sandcastle events with temporary power-ups.
+Version 1.0.0 features a large backyard battlefield, physical toy cover, concealment bushes, terrain patches, a pixel minimap, stagger-producing dash impacts, dot healing, humanized bots, dual mobile sticks, and five-minute sandcastle events with temporary power-ups. Eliminated tanks respawn at level 1 with zero XP.
 
 ## Local development
 

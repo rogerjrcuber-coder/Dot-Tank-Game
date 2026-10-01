@@ -127,12 +127,16 @@ function awardXp(player: Player, amount: number) {
   }
 }
 
+function resetProgression(player: Player) {
+  player.level = 1; player.xp = 0; player.xpProgress = 0; player.maxHealth = 100;
+}
+
 function defeat(victim: Player, arena: Arena, cause: KillFeedItem['cause'], attackerId?: string) {
   if (victim.respawnAt) return;
   const now = Date.now();
   const attacker = attackerId ? arena.players.get(attackerId) : undefined;
   for (const [contributorId, hitAt] of victim.damageContributors) { const contributor = arena.players.get(contributorId); if (contributor && contributor.id !== attacker?.id && now - hitAt <= 8000) { contributor.assists += 1; awardXp(contributor, 30); } }
-  victim.deaths += 1; victim.health = 0; victim.vx = 0; victim.vy = 0; victim.input = emptyInput();
+  victim.deaths += 1; resetProgression(victim); victim.health = 0; victim.vx = 0; victim.vy = 0; victim.input = emptyInput();
   victim.respawnAt = now + RESPAWN_DELAY; victim.respawnIn = RESPAWN_DELAY; victim.shielded = false; victim.outsideSince = undefined; victim.damageContributors.clear();
   if (attacker && attacker.id !== victim.id) { attacker.eliminations += 1; attacker.health += (attacker.maxHealth - attacker.health) * .5; awardXp(attacker, 75); }
   arena.killFeed.push({ id: randomUUID(), attacker: attacker?.name ?? 'THE WORLD', victim: victim.name, cause, createdAt: now });
