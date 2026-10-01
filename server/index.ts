@@ -45,10 +45,9 @@ function makeDot(id: string): DotSnapshot { return { id, x: BOUNDARY + 40 + Math
 function makeEnvironment(seed: number): EnvironmentSnapshot[] {
   const items: EnvironmentSnapshot[] = [];
   const add = (kind: EnvironmentSnapshot['kind'], x: number, y: number, width: number, height: number, solid: boolean) => items.push({ id: `${seed}-${kind}-${items.length}`, kind, x, y, width, height, solid });
-  for (const [x, y, width, height] of [[650, 480, 260, 52], [2490, 480, 260, 52], [650, 1668, 260, 52], [2490, 1668, 260, 52], [1500, 770, 400, 48], [1500, 1380, 400, 48]]) add('brick', x, y, width, height, true);
-  for (const [x, y] of [[420, 1050], [2920, 1050], [1100, 350], [2250, 1830], [1120, 1830], [2280, 350]]) add('rock', x, y, 90, 78, true);
-  for (const [x, y, width, height] of [[930, 1030, 190, 28], [2280, 1120, 190, 28], [1620, 360, 28, 180], [1750, 1660, 28, 180]]) add('branch', x, y, width, height, true);
-  for (const [x, y] of [[780, 760], [2550, 760], [780, 1370], [2550, 1370], [1320, 1080], [1980, 1020]]) add('bush', x, y, 150, 120, false);
+  for (const [x, y, width, height] of [[330, 430, 590, 120], [2440, 440, 590, 120], [2390, 1510, 600, 120]]) add('brick', x, y, width, height, true);
+  for (const [x, y, width, height] of [[570, 190, 720, 105], [2780, 790, 125, 520], [980, 1450, 390, 90]]) add('rock', x, y, width, height, true);
+  for (const [x, y, width, height] of [[160, 760, 190, 180], [660, 930, 220, 190], [2020, 100, 230, 180], [2220, 850, 250, 200], [1660, 1640, 280, 200]]) add('bush', x, y, width, height, false);
   for (let index = 0; index < 14; index += 1) add(index % 2 ? 'flower' : 'gravel', 280 + ((index * 241 + seed * 73) % 2800), 250 + ((index * 173 + seed * 91) % 1650), 72, 58, false);
   add('dirt', 1380, 900, 640, 390, false); add('gravel', 250, 260, 420, 300, false);
   return items;
