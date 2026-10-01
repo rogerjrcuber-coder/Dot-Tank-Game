@@ -22,6 +22,7 @@ const OBJECTIVE_INTERVAL = 300000;
 const POWER_UP_DURATION = 90000;
 const colors: PlayerColor[] = ['pink', 'cyan', 'lime', 'orange', 'violet', 'yellow'];
 const personalities: BotPersonality[] = ['hunter', 'collector', 'berserker', 'sniper', 'opportunist', 'survivor'];
+const botNames = ['Alex', 'Avery', 'Bailey', 'Cameron', 'Casey', 'Charlie', 'Drew', 'Emery', 'Harper', 'Jamie', 'Jordan', 'Kai', 'Logan', 'Morgan', 'Parker', 'Quinn', 'Reese', 'Riley', 'Robin', 'Taylor'];
 const regions: RegionSnapshot[] = [
   { id: 'bush-region', kind: 'bush', label: 'Bush Maze', x: 170, y: 170, width: 1800, height: 1450 },
   { id: 'fort-region', kind: 'fort', label: 'Toy Fort', x: 2180, y: 170, width: 1700, height: 850 },
@@ -89,8 +90,10 @@ function createPlayer(id: string, socketId: string, name: string, color: PlayerC
 
 function addBots(arena: Arena) {
   while ([...arena.players.values()].filter((player) => player.isBot).length < BOT_COUNT) {
-    const personality = personalities[Math.floor(Math.random() * personalities.length)];
-    const bot = createPlayer(`bot-${arena.id}-${randomUUID().slice(0, 5)}`, '', `${personality.toUpperCase()}-${Math.floor(Math.random() * 90 + 10)}`, colors[Math.floor(Math.random() * colors.length)], arena, true);
+    const usedNames = new Set([...arena.players.values()].map((player) => player.name));
+    const availableNames = botNames.filter((name) => !usedNames.has(name));
+    const namePool = availableNames.length ? availableNames : botNames;
+    const bot = createPlayer(`bot-${arena.id}-${randomUUID().slice(0, 5)}`, '', namePool[Math.floor(Math.random() * namePool.length)], colors[Math.floor(Math.random() * colors.length)], arena, true);
     arena.players.set(bot.id, bot);
   }
 }

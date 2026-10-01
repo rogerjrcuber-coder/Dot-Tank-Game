@@ -39,7 +39,7 @@ input:focus { border-color:var(--cyan); }
 .status, .leaderboard, .kill-feed, .dash-meter { background:#000; border:4px solid #734b36; box-shadow:4px 4px 0 #980019; }
 .status { color:#b9c5d8; font-size:9px; letter-spacing:.08em; padding:10px; white-space:nowrap; }
 .leaderboard { width:260px; padding:13px; } .leaderboard h3 { margin:0 0 12px; color:var(--yellow); font-size:9px; letter-spacing:.12em; }
-.rank { display:grid; grid-template-columns:22px 12px 1fr auto; gap:7px; align-items:center; font-size:9px; margin:8px 0; padding:3px; } .rank.me { background:#25334a; } .rank b { color:#6e7e9b; } .rank span { min-width:0; overflow:hidden; } .rank small { display:block; color:#71809e; font-size:7px; margin-top:2px; } .rank em { color:#b8f34a; font-style:normal; font-size:8px; } .mini { width:8px; height:8px; display:block; }
+.rank { display:grid; grid-template-columns:22px 12px 1fr; gap:7px; align-items:center; font-size:9px; margin:8px 0; padding:3px; } .rank.me { background:#25334a; } .rank b { color:#6e7e9b; } .rank span { min-width:0; overflow:hidden; } .rank small { display:block; color:#71809e; font-size:7px; margin-top:3px; } .mini { width:8px; height:8px; display:block; }
 .kill-feed { margin-top:10px; padding:8px 10px; width:260px; } .kill-feed p { margin:4px 0; color:#9aa8bf; font-size:7px; } .kill-feed b { color:#fff; }
 .dash-meter { margin-top:14px; width:150px; padding:6px; } .dash-meter b { display:block; color:var(--cyan); font-size:8px; margin-bottom:5px; } .dash-meter i { display:block; width:100%; height:8px; background:var(--cyan); max-width:138px; box-shadow:0 0 0 2px #163b3b; }
 .power, .event { margin-top:10px; width:180px; color:#f3e4ad; background:#000; border:4px solid #f3e4ad; padding:6px 8px; font-size:8px; box-shadow:4px 4px 0 #980019; } .power:empty { display:none; } .event { color:#bd7f59; border-color:#bd7f59; }
@@ -48,22 +48,17 @@ input:focus { border-color:var(--cyan); }
 .respawn { position:absolute; inset:0; display:grid; place-items:center; color:#fff; background:#07140d; font-size:22px; font-weight:900; letter-spacing:.08em; text-shadow:4px 4px 0 #74265f; }
 .toast { position:absolute; bottom:40px; left:50%; transform:translateX(-50%); background:var(--pink); border:3px solid #fff; color:#090d16; padding:12px 16px; font-weight:900; font-size:9px; opacity:0; box-shadow:5px 5px 0 #74265f; transition:opacity .1s steps(2); } .toast.show { opacity:1; }
 .mobile-controls { display:none; }
+.touch-ui .game { touch-action:none; user-select:none; }
 .touch-ui .mobile-controls { display:block; position:absolute; inset:0; pointer-events:none; }
-.touch-ui .stick,.touch-ui .aim-stick,.touch-ui .dash { pointer-events:auto; touch-action:none; position:absolute; background:#000c; color:#fff; border:4px solid; box-shadow:5px 5px 0 #000; }
-.touch-ui .stick { left:20px; bottom:24px; width:94px; height:94px; border-color:var(--cyan); }.touch-ui .stick i { display:block; width:28px; height:28px; margin:29px; background:var(--cyan); }
-.touch-ui .aim-stick { right:20px; bottom:24px; width:94px; height:94px; border-color:var(--violet); }.touch-ui .aim-stick i { display:block; width:24px; height:24px; margin:31px; background:var(--violet); }
-.touch-ui .dash { right:126px; bottom:30px; width:58px; height:58px; border-color:var(--yellow); font-size:7px; }
-.touch-ui .auto-fire { position:absolute; right:21px; bottom:126px; width:94px; padding:6px 3px; color:#000; background:var(--lime); border:3px solid #000; text-align:center; font-size:6px; box-shadow:4px 4px 0 #167635; }
-.touch-ui .status,.touch-ui .kill-feed,.touch-ui .minimap,.touch-ui .event,.touch-ui .power,.touch-ui .rules { display:none; }
-.touch-ui .hud { padding:8px; }.touch-ui .hud-left { width:112px; }.touch-ui .brand { font-size:9px; }.touch-ui .brand span { display:none; }.touch-ui .dash-meter { width:104px; margin-top:8px; }
-.touch-ui .leaderboard { width:152px; padding:7px; }.touch-ui .leaderboard h3 { margin-bottom:7px; font-size:7px; }.touch-ui .rank { grid-template-columns:15px 8px 1fr; gap:4px; font-size:7px; margin:5px 0; }.touch-ui .rank em,.touch-ui .rank small { display:none; }.touch-ui .rank:nth-of-type(n+5) { display:none; }
+.touch-ui .stick,.touch-ui .aim-stick,.touch-ui .dash { pointer-events:auto; touch-action:none; position:absolute; background:#0009; color:#fff; border:3px solid; box-shadow:4px 4px 0 #0009; }
+.touch-ui .stick,.touch-ui .aim-stick { bottom:max(18px,env(safe-area-inset-bottom)); width:108px; height:108px; }
+.touch-ui .stick { left:max(18px,env(safe-area-inset-left)); border-color:var(--cyan); }.touch-ui .aim-stick { right:max(18px,env(safe-area-inset-right)); border-color:var(--violet); }
+.touch-ui .stick i,.touch-ui .aim-stick i { display:block; position:absolute; left:50%; top:50%; width:26px; height:26px; margin:-13px; will-change:transform; }
+.touch-ui .stick i { background:var(--cyan); }.touch-ui .aim-stick i { background:var(--violet); }
+.touch-ui .stick::after,.touch-ui .aim-stick::after { position:absolute; left:0; right:0; bottom:8px; text-align:center; font-size:6px; color:#fff; text-shadow:2px 2px 0 #000; }.touch-ui .stick::after { content:"MOVE"; }.touch-ui .aim-stick::after { content:"AIM + AUTO"; }
+.touch-ui .dash { right:max(138px,calc(env(safe-area-inset-right) + 138px)); bottom:max(31px,calc(env(safe-area-inset-bottom) + 13px)); width:58px; height:58px; border-color:var(--yellow); font-size:7px; }
+.touch-ui .auto-fire,.touch-ui .status,.touch-ui .kill-feed,.touch-ui .minimap,.touch-ui .event,.touch-ui .power,.touch-ui .rules,.touch-ui .brand,.touch-ui .leaderboard { display:none; }
+.touch-ui .hud { padding:0; }.touch-ui .hud-left { width:auto; }.touch-ui .dash-meter { position:absolute; top:max(10px,env(safe-area-inset-top)); left:50%; transform:translateX(-50%); width:96px; margin:0; padding:5px; border-width:3px; box-shadow:3px 3px 0 #0009; }.touch-ui .dash-meter b { font-size:6px; margin-bottom:4px; }.touch-ui .dash-meter i { height:6px; }
 @media (max-width:700px) {
   .lobby { display:block; } .panel { padding:7vh 25px; border:0; box-shadow:none; background:#000e; } .hero-art { position:absolute; inset:0; opacity:.28; } .hero-copy { display:none; } h1 { font-size:38px; } .form-row { grid-template-columns:1fr; gap:14px; } .rules { bottom:25px; gap:18px; }
-  .hud { padding:10px; } .hud-left { width:130px; } .status { position:absolute; top:58px; left:10px; white-space:normal; width:130px; }
-  .leaderboard { width:165px; padding:8px; } .rank { grid-template-columns:16px 8px 1fr; gap:5px; } .rank em, .rank small { display:none; } .kill-feed { width:165px; }
-  .minimap { width:130px; height:84px; } .event, .power { width:130px; }
-  .mobile-controls { display:block; position:absolute; inset:0; pointer-events:none; } .stick, .aim-stick, .dash { pointer-events:auto; touch-action:none; position:absolute; background:#000c; color:#fff; font-weight:900; border:4px solid; box-shadow:5px 5px 0 #000; }
-  .stick { left:22px; bottom:28px; width:100px; height:100px; border-color:var(--cyan); } .stick i { display:block; width:32px; height:32px; margin:30px; background:var(--cyan); }
-  .aim-stick { right:22px; bottom:28px; width:100px; height:100px; border-color:var(--violet); } .aim-stick i { display:block; width:24px; height:24px; margin:34px; background:var(--violet); }
-  .dash { right:108px; bottom:38px; width:58px; height:58px; border-color:var(--yellow); font-size:8px; }
 }
