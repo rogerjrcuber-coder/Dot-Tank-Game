@@ -6,7 +6,7 @@ import './style.css';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const colors: PlayerColor[] = ['pink', 'cyan', 'lime', 'orange', 'violet', 'yellow'];
-const colorValues: Record<PlayerColor, string> = { pink: '#f1444d', cyan: '#7195be', lime: '#b0ed13', orange: '#bd7f59', violet: '#980019', yellow: '#f3e4ad' };
+const colorValues: Record<PlayerColor, string> = { pink: '#f04fa3', cyan: '#35d6e8', lime: '#f4f7ff', orange: '#ff7a32', violet: '#9d5cff', yellow: '#4f8cff' };
 const storedName = sessionStorage.getItem('dot-tank-name') ?? '';
 const storedColor = (sessionStorage.getItem('dot-tank-color') as PlayerColor | null) ?? 'pink';
 sessionStorage.removeItem('dot-tank-token');
@@ -39,6 +39,8 @@ titleTank.innerHTML = `<g shape-rendering="crispEdges">
   <path class="shine" d="M159 248 301 185 423 223 280 288Z"/>
   <path class="track-mark" d="M123 310 325 378 325 390 123 319ZM353 377 520 301 520 313 353 390Z"/>
 </g>`;
+document.querySelector('.hero-copy b')!.textContent = 'ONE WORLD';
+document.querySelector('.hero-copy span')!.textContent = 'FIVE REGIONS';
 
 const colorPicker = document.querySelector<HTMLDivElement>('#colors')!;
 let selectedColor: PlayerColor = colors.includes(storedColor) ? storedColor : 'pink';
@@ -66,8 +68,8 @@ function connect(name: string) {
 
 function renderHud() {
   if (!state.snapshot) return; const me = state.snapshot.players.find((player) => player.id === state.playerId);
-  document.querySelector('#status')!.textContent = me ? `ARENA ${String(state.snapshot.arenaId + 1).padStart(2, '0')} // ${state.snapshot.online} HUMAN + ${state.snapshot.bots} BOTS` : 'SYNCING';
-  const rows = [...state.snapshot.players].sort((a, b) => b.xp - a.xp || b.eliminations - a.eliminations).slice(0, 10).map((player, index) => `<div class="rank ${player.id === state.playerId ? 'me' : ''}"><b>${String(index + 1).padStart(2, '0')}</b><i class="mini ${player.color}"></i><span>${escapeHtml(player.name)}<small>${player.xp} XP // ${player.eliminations}K ${player.deaths}D</small></span><em>L${player.level}</em></div>`).join('');
+  document.querySelector('#status')!.textContent = me ? `ONE WORLD // ${state.snapshot.online} HUMAN + ${state.snapshot.bots} BOTS` : 'SYNCING';
+  const rows = [...state.snapshot.players].sort((a, b) => b.xp - a.xp || b.eliminations - a.eliminations).slice(0, 10).map((player, index) => `<div class="rank ${player.id === state.playerId ? 'me' : ''}"><b>${String(index + 1).padStart(2, '0')}</b><i class="mini ${player.color}"></i><span>${escapeHtml(player.name)}<small>${player.xp} XP // ${player.eliminations}K ${player.assists}A ${player.deaths}D</small></span><em>L${player.level}</em></div>`).join('');
   document.querySelector('#leaderboard')!.innerHTML = `<h3>ARENA RANKING</h3>${rows}`;
   document.querySelector('#kill-feed')!.innerHTML = state.snapshot.killFeed.slice().reverse().map((item) => `<p><b>${escapeHtml(item.attacker)}</b> ${item.cause === 'ringout' ? 'RANG OUT' : item.cause === 'bump' ? 'CRUSHED' : 'BLASTED'} <b>${escapeHtml(item.victim)}</b></p>`).join('');
   if (me) {
@@ -88,7 +90,7 @@ function burst(x: number, y: number, color: string, count: number) { for (let in
 function escapeHtml(value: string) { const entities: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }; return value.replace(/[&<>"']/g, (character) => entities[character]); }
 function showToast(message: string) { const toast = document.querySelector('#toast')!; toast.textContent = message; toast.classList.add('show'); window.setTimeout(() => toast.classList.remove('show'), 2500); }
 function formatTime(milliseconds: number) { const seconds = Math.ceil(milliseconds / 1000); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
-function updateMobileAutoFire(snapshot: ArenaSnapshot) { if (!usesTouchControls) return; const me = snapshot.players.find((player) => player.id === state.playerId); state.input.firing = Boolean(me && !me.respawnIn && snapshot.players.some((player) => player.id !== me.id && !player.respawnIn && player.health > 0 && Math.hypot(player.x - me.x, player.y - me.y) <= 340)); }
+function updateMobileAutoFire(snapshot: ArenaSnapshot) { if (!usesTouchControls) return; const me = snapshot.players.find((player) => player.id === state.playerId); state.input.firing = Boolean(me && !me.respawnIn && snapshot.players.some((player) => player.id !== me.id && !player.respawnIn && !player.concealed && player.health > 0 && Math.hypot(player.x - me.x, player.y - me.y) <= 340)); }
 
 const canvas = document.querySelector<HTMLCanvasElement>('#arena')!; const context = canvas.getContext('2d', { alpha: false })!; context.imageSmoothingEnabled = false;
 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; canvas.style.width = `${window.innerWidth}px`; canvas.style.height = `${window.innerHeight}px`; context.imageSmoothingEnabled = false; } window.addEventListener('resize', resize); resize();
@@ -103,7 +105,7 @@ function draw() {
     if (state.snapshot.objective) drawObjective(state.snapshot.objective.x, state.snapshot.objective.y, state.snapshot.objective.health / state.snapshot.objective.maxHealth);
     for (const powerUp of state.snapshot.powerUps) drawPowerUp(powerUp.x, powerUp.y, powerUp.kind);
     for (const bullet of state.snapshot.bullets) { const direction = direction8(bullet.angle); const bx = Math.round(bullet.x); const by = Math.round(bullet.y); context.fillStyle = colorValues[bullet.color]; context.fillRect(bx - direction.x * 5 - 3, by - direction.y * 5 - 3, 6, 6); context.fillStyle = '#fff7c2'; context.fillRect(bx - 3, by - 3, 7, 7); context.fillStyle = '#ffffff'; context.fillRect(bx, by - 2, 3, 3); }
-    for (const player of state.snapshot.players) drawTank(player);
+    for (const player of state.snapshot.players) if (!player.concealed || player.id === state.playerId) drawTank(player);
     updateParticles(); context.restore();
   }
   requestAnimationFrame(draw);
@@ -111,21 +113,23 @@ function draw() {
 
 function drawArena(snapshot: ArenaSnapshot) {
   context.fillStyle = '#1fb34d'; context.fillRect(0, 0, snapshot.width, snapshot.height);
-  context.fillStyle = '#11542a'; for (let y = 36; y < snapshot.height; y += 128) for (let x = (y / 2) % 160; x < snapshot.width; x += 190) { context.fillRect(x, y, 9, 24); context.fillRect(x + 9, y - 8, 8, 12); }
-  for (const line of [[100, 120, 3080, 2120], [420, 110, 140, 880], [930, 110, 240, 1100], [1570, 110, 680, 2090], [2100, 110, 1500, 2090], [2570, 110, 2080, 2090], [3190, 110, 2670, 2090], [120, 930, 1450, 2090], [120, 1510, 930, 2090], [650, 110, 3280, 760]] as const) drawPixelLine(line[0], line[1], line[2], line[3], '#b0ed13', 9);
-  const cx = snapshot.width / 2; const cy = snapshot.height / 2; context.fillStyle = '#36241b'; context.beginPath(); context.moveTo(cx - 410, cy - 290); context.lineTo(cx + 390, cy - 220); context.lineTo(cx + 330, cy + 270); context.lineTo(cx - 470, cy + 210); context.closePath(); context.fill(); context.fillStyle = '#f3e4ad'; context.beginPath(); context.moveTo(cx - 392, cy - 267); context.lineTo(cx + 367, cy - 201); context.lineTo(cx + 310, cy + 246); context.lineTo(cx - 446, cy + 190); context.closePath(); context.fill(); context.fillStyle = '#bd7f59'; context.fillRect(cx - 175, cy - 100, 350, 190);
+  for (let y = 0; y < snapshot.height; y += 16) for (let x = 0; x < snapshot.width; x += 32) { context.fillStyle = (x / 32 + y / 16) % 2 ? '#1cad48' : '#22b952'; context.fillRect(x, y, 32, 16); }
+  for (const region of snapshot.regions) drawRegion(region);
   context.fillStyle = '#660012'; context.fillRect(snapshot.boundary - 10, snapshot.boundary - 10, snapshot.width - snapshot.boundary * 2 + 20, 10); context.fillRect(snapshot.boundary - 10, snapshot.height - snapshot.boundary, snapshot.width - snapshot.boundary * 2 + 20, 10); context.fillRect(snapshot.boundary - 10, snapshot.boundary, 10, snapshot.height - snapshot.boundary * 2); context.fillRect(snapshot.width - snapshot.boundary, snapshot.boundary, 10, snapshot.height - snapshot.boundary * 2);
 }
+
+function drawRegion(region: ArenaSnapshot['regions'][number]) { const colors = { sandbox: ['#f3e4ad','#e2c987'], bush: ['#12632d','#167635'], garden: ['#8b5d42','#9f6b49'], driveway: ['#71849a','#66778d'], fort: ['#2a9141','#238039'] } as const; const palette = colors[region.kind]; for (let y = region.y; y < region.y + region.height; y += 16) for (let x = region.x; x < region.x + region.width; x += 32) { context.fillStyle = palette[(x / 32 + y / 16) % 2 ? 0 : 1]; context.fillRect(x, y, Math.min(32, region.x + region.width - x), Math.min(16, region.y + region.height - y)); } context.fillStyle = region.kind === 'driveway' ? '#506176' : region.kind === 'sandbox' ? '#bd7f59' : '#0b371c'; context.fillRect(region.x, region.y, region.width, 8); context.fillRect(region.x, region.y, 8, region.height); }
 
 function drawPixelLine(x0: number, y0: number, x1: number, y1: number, color: string, pixel: number) { const dx = x1 - x0; const dy = y1 - y0; const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / pixel)); context.fillStyle = color; for (let step = 0; step <= steps; step += 1) context.fillRect(Math.round((x0 + dx * step / steps) / pixel) * pixel, Math.round((y0 + dy * step / steps) / pixel) * pixel, pixel, pixel); }
 
 function drawDot(x: number, y: number) { context.fillStyle = '#9b6e22'; context.fillRect(Math.round(x) - 7, Math.round(y) - 7, 14, 14); context.fillStyle = '#ffd85c'; context.fillRect(Math.round(x) - 5, Math.round(y) - 5, 10, 10); context.fillStyle = '#fff3a6'; context.fillRect(Math.round(x) - 3, Math.round(y) - 3, 4, 4); }
 function drawEnvironment(item: ArenaSnapshot['environment'][number]) {
-  const palettes = { brick: ['#f91b24','#b41218'], rock: ['#aaaaaa','#555555'], branch: ['#bd7f59','#5b3d2c'], bush: ['#167635','#0b371c'], flower: ['#b0ed13','#506b09'], dirt: ['#bd7f59','#875b41'], gravel: ['#f3e4ad','#736c54'] } as const; const palette = palettes[item.kind];
+  const palettes = { brick: ['#f91b24','#b41218'], rock: ['#aaaaaa','#555555'], branch: ['#bd7f59','#5b3d2c'], bush: ['#167635','#0b371c'], flower: ['#b0ed13','#506b09'], dirt: ['#bd7f59','#875b41'], gravel: ['#f3e4ad','#736c54'], chalk: ['#f4f7ff','#7195be'] } as const; const palette = palettes[item.kind];
   context.fillStyle = palette[1]; context.fillRect(item.x, item.y + 8, item.width, item.height); context.fillStyle = palette[0];
   if (item.kind === 'brick') { context.fillRect(item.x + 8, item.y + 8, item.width - 16, item.height - 18); for (let x = item.x + 12; x < item.x + item.width - 35; x += 118) context.fillRect(x, item.y - 22, 72, 42); context.fillStyle = '#f1444d'; context.fillRect(item.x + 18, item.y + item.height / 2, item.width - 36, 9); }
   else if (item.kind === 'rock') { context.fillRect(item.x + 24, item.y, item.width - 48, item.height); context.fillRect(item.x + 8, item.y + 22, item.width - 16, item.height - 38); context.fillStyle = '#858585'; for (let x = 35; x < item.width - 30; x += 90) context.fillRect(item.x + x, item.y + 18 + (x % 3) * 7, Math.min(56, item.width - x), 18); }
   else if (item.kind === 'bush') { context.fillRect(item.x + 22, item.y + 18, item.width - 44, item.height - 24); context.fillRect(item.x + 4, item.y + 55, item.width - 8, item.height - 82); context.fillRect(item.x + 48, item.y, item.width - 96, item.height); context.fillStyle = '#1f8d3f'; for (let y = 30; y < item.height - 20; y += 48) for (let x = 30 + (y % 60); x < item.width - 20; x += 64) context.fillRect(item.x + x, item.y + y, 22, 20); }
+  else if (item.kind === 'chalk') { context.fillRect(item.x, item.y, item.width, item.height); }
   else if (item.kind === 'flower' || item.kind === 'gravel' || item.kind === 'dirt') { context.fillRect(item.x, item.y, item.width, item.height); for (let y = 8; y < item.height; y += 18) for (let x = 8; x < item.width; x += 22) { context.fillStyle = palette[(x + y) % 3 ? 0 : 1]; context.fillRect(item.x + x, item.y + y, item.kind === 'flower' ? 5 : 7, item.kind === 'flower' ? 5 : 4); } }
   else { for (let x = 5; x < item.width; x += 24) context.fillRect(item.x + x, item.y + 5, 16, Math.max(6, item.height - 10)); }
 }
@@ -143,7 +147,7 @@ function drawTank(player: PlayerSnapshot) {
   if (player.shielded) { context.strokeStyle = '#7ffcff'; context.lineWidth = 3; context.strokeRect(x - 25, y - 24, 50, 48); }
   context.textAlign = 'center'; context.font = '9px "Press Start 2P"'; context.fillStyle = '#000'; context.fillText(`${player.name} L${player.level}`, x + 2, y - 27); context.fillStyle = '#fff'; context.fillText(`${player.name} L${player.level}`, x, y - 29); context.fillStyle = '#980019'; context.fillRect(x - 25, y + 22, 50, 5); context.fillStyle = color; context.fillRect(x - 25, y + 22, Math.max(0, 50 * player.health / player.maxHealth), 5);
 }
-function drawMinimap(snapshot: ArenaSnapshot, me: PlayerSnapshot) { const minimap = document.querySelector<HTMLCanvasElement>('#minimap')!; const map = minimap.getContext('2d')!; map.imageSmoothingEnabled = false; map.fillStyle = '#07101a'; map.fillRect(0, 0, minimap.width, minimap.height); const sx = minimap.width / snapshot.width; const sy = minimap.height / snapshot.height; map.strokeStyle = '#ff4fa3'; map.lineWidth = 2; map.strokeRect(snapshot.boundary * sx, snapshot.boundary * sy, (snapshot.width - snapshot.boundary * 2) * sx, (snapshot.height - snapshot.boundary * 2) * sy); for (const item of snapshot.environment) { if (!item.solid) continue; map.fillStyle = '#667085'; map.fillRect(item.x * sx, item.y * sy, Math.max(2, item.width * sx), Math.max(2, item.height * sy)); } if (snapshot.objective) { map.fillStyle = '#ffd85c'; map.fillRect(snapshot.objective.x * sx - 3, snapshot.objective.y * sy - 3, 7, 7); } map.fillStyle = '#fff'; map.fillRect(me.x * sx - 2, me.y * sy - 2, 5, 5); }
+function drawMinimap(snapshot: ArenaSnapshot, me: PlayerSnapshot) { const minimap = document.querySelector<HTMLCanvasElement>('#minimap')!; const map = minimap.getContext('2d')!; map.imageSmoothingEnabled = false; map.fillStyle = '#1fb34d'; map.fillRect(0, 0, minimap.width, minimap.height); const sx = minimap.width / snapshot.width; const sy = minimap.height / snapshot.height; const regionColors = { sandbox:'#f3e4ad', bush:'#12632d', garden:'#9f6b49', driveway:'#71849a', fort:'#2a9141' }; for (const region of snapshot.regions) { map.fillStyle = regionColors[region.kind]; map.fillRect(region.x * sx, region.y * sy, region.width * sx, region.height * sy); } map.strokeStyle = '#980019'; map.lineWidth = 2; map.strokeRect(snapshot.boundary * sx, snapshot.boundary * sy, (snapshot.width - snapshot.boundary * 2) * sx, (snapshot.height - snapshot.boundary * 2) * sy); for (const item of snapshot.environment) { if (!item.solid) continue; map.fillStyle = '#000'; map.fillRect(item.x * sx, item.y * sy, Math.max(2, item.width * sx), Math.max(2, item.height * sy)); } if (snapshot.objective) { map.fillStyle = '#f91b24'; map.fillRect(snapshot.objective.x * sx - 3, snapshot.objective.y * sy - 3, 7, 7); } map.fillStyle = '#fff'; map.fillRect(me.x * sx - 2, me.y * sy - 2, 5, 5); }
 function updateParticles() { for (let index = particles.length - 1; index >= 0; index -= 1) { const particle = particles[index]; particle.x += particle.vx; particle.y += particle.vy; particle.vx *= .91; particle.vy *= .91; particle.life -= 16; context.fillStyle = particle.color; context.fillRect(Math.round(particle.x), Math.round(particle.y), particle.size, particle.size); if (particle.life <= 0) particles.splice(index, 1); } }
 draw();
 
