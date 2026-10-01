@@ -125,11 +125,17 @@ function drawObjective(x: number, y: number, health: number) { context.fillStyle
 function drawPowerUp(x: number, y: number, kind: string) { context.fillStyle = '#fff'; context.fillRect(x - 16, y - 16, 32, 32); context.fillStyle = '#7195be'; context.fillRect(x - 12, y - 12, 24, 24); context.fillStyle = '#000'; context.font = '10px "Press Start 2P"'; context.textAlign = 'center'; context.fillText(kind[0].toUpperCase(), x, y + 5); }
 const directions8 = [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }, { x: -1, y: 1 }, { x: -1, y: 0 }, { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 }] as const;
 function direction8(angle: number) { const safeAngle = Number.isFinite(angle) ? angle : 0; const rawIndex = Math.round(safeAngle / (Math.PI / 4)); const index = ((rawIndex % directions8.length) + directions8.length) % directions8.length; return directions8[index] ?? directions8[0]; }
+const tankTravelDirections = new Map<string, (typeof directions8)[number]>();
 function drawTank(player: PlayerSnapshot) {
-  if (player.respawnIn) return; const color = colorValues[player.color]; const x = Math.round(player.x); const y = Math.round(player.y); const turret = direction8(player.angle);
-  context.save(); context.globalAlpha = player.concealed && player.id !== state.playerId ? .48 : 1; context.translate(x, y); if (player.dashing) { context.fillStyle = '#ffffff'; context.fillRect(-28 - Math.sign(player.vx) * 8, -14, 8, 6); context.fillRect(-30 - Math.sign(player.vx) * 5, 7, 6, 5); }
-  context.fillStyle = '#000'; context.fillRect(-18, -15, 36, 7); context.fillRect(-18, 8, 36, 7); context.fillStyle = '#858585'; for (let track = -14; track <= 10; track += 8) { context.fillRect(track, -13, 5, 3); context.fillRect(track, 10, 5, 3); }
-  context.fillStyle = color; context.fillRect(-15, -9, 30, 18); context.fillStyle = '#101827'; context.fillRect(-9, -6, 18, 12); context.fillStyle = '#e8edf5'; context.fillRect(-4, -3, 8, 6);
+  if (player.respawnIn) return; const color = colorValues[player.color]; const x = Math.round(player.x); const y = Math.round(player.y); const turret = direction8(player.angle); const speed = Math.hypot(player.vx, player.vy);
+  if (speed > .35) tankTravelDirections.set(player.id, direction8(Math.atan2(player.vy, player.vx)));
+  const body = tankTravelDirections.get(player.id) ?? direction8(player.angle); const side = { x: -body.y, y: body.x };
+  context.save(); context.globalAlpha = player.concealed && player.id !== state.playerId ? .48 : 1; context.translate(x, y);
+  if (player.dashing) { context.fillStyle = '#ffffff'; for (const offset of [-5, 5]) for (let step = 5; step <= 6; step += 1) context.fillRect(-body.x * step * 5 + side.x * offset - 3, -body.y * step * 5 + side.y * offset - 3, 6, 6); }
+  context.fillStyle = '#000'; for (const offset of [-11, 11]) for (let step = -3; step <= 3; step += 1) context.fillRect(body.x * step * 5 + side.x * offset - 4, body.y * step * 5 + side.y * offset - 4, 8, 8);
+  context.fillStyle = '#858585'; for (const offset of [-11, 11]) for (let step = -2; step <= 2; step += 2) context.fillRect(body.x * step * 6 + side.x * offset - 2, body.y * step * 6 + side.y * offset - 2, 4, 4);
+  context.fillStyle = color; for (let forward = -2; forward <= 2; forward += 1) for (let across = -1; across <= 1; across += 1) context.fillRect(body.x * forward * 6 + side.x * across * 6 - 4, body.y * forward * 6 + side.y * across * 6 - 4, 8, 8);
+  context.fillStyle = '#101827'; context.fillRect(-7, -7, 14, 14); context.fillStyle = '#e8edf5'; context.fillRect(-3, -3, 6, 6);
   context.fillStyle = '#101827'; context.fillRect(-6, -6, 12, 12); context.fillStyle = color; for (let step = 1; step <= 4; step += 1) context.fillRect(turret.x * step * 5 - 4, turret.y * step * 5 - 4, 8, 8); context.fillStyle = '#fff7c2'; context.fillRect(turret.x * 23 - 3, turret.y * 23 - 3, 7, 7); context.restore();
   if (player.staggeredIn) { context.fillStyle = '#ffd85c'; context.fillRect(x - 13, y - 33, 6, 6); context.fillRect(x + 5, y - 37, 6, 6); }
   if (player.shielded) { context.strokeStyle = '#7ffcff'; context.lineWidth = 3; context.strokeRect(x - 25, y - 24, 50, 48); }
