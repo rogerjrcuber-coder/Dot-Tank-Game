@@ -66,19 +66,20 @@ function escapeHtml(value: string) { const entities: Record<string, string> = { 
 function showToast(message: string) { const toast = document.querySelector('#toast')!; toast.textContent = message; toast.classList.add('show'); window.setTimeout(() => toast.classList.remove('show'), 2500); }
 function formatTime(milliseconds: number) { const seconds = Math.ceil(milliseconds / 1000); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
 
-const canvas = document.querySelector<HTMLCanvasElement>('#arena')!; const context = canvas.getContext('2d')!; context.imageSmoothingEnabled = false;
-function resize() { const ratio = window.devicePixelRatio || 1; canvas.width = Math.floor(window.innerWidth * ratio); canvas.height = Math.floor(window.innerHeight * ratio); canvas.style.width = `${window.innerWidth}px`; canvas.style.height = `${window.innerHeight}px`; context.setTransform(ratio, 0, 0, ratio, 0, 0); context.imageSmoothingEnabled = false; } window.addEventListener('resize', resize); resize();
+const PIXEL_SCALE = 3;
+const canvas = document.querySelector<HTMLCanvasElement>('#arena')!; const context = canvas.getContext('2d', { alpha: false })!; context.imageSmoothingEnabled = false;
+function resize() { canvas.width = Math.max(1, Math.ceil(window.innerWidth / PIXEL_SCALE)); canvas.height = Math.max(1, Math.ceil(window.innerHeight / PIXEL_SCALE)); canvas.style.width = `${window.innerWidth}px`; canvas.style.height = `${window.innerHeight}px`; context.imageSmoothingEnabled = false; } window.addEventListener('resize', resize); resize();
 
 function draw() {
-  const width = window.innerWidth; const height = window.innerHeight; context.fillStyle = '#070a12'; context.fillRect(0, 0, width, height);
+  const width = canvas.width; const height = canvas.height; context.fillStyle = '#07140d'; context.fillRect(0, 0, width, height);
   if (state.snapshot) {
-    const me = state.snapshot.players.find((player) => player.id === state.playerId) ?? state.snapshot.players[0]; const scale = Math.max(.55, Math.min(1, Math.min(width / 1050, height / 720))); const shake = me?.dashing ? 4 : 0; const ox = Math.round(width / 2 - (me?.x ?? state.snapshot.width / 2) * scale + (Math.random() - .5) * shake); const oy = Math.round(height / 2 - (me?.y ?? state.snapshot.height / 2) * scale + (Math.random() - .5) * shake);
+    const me = state.snapshot.players.find((player) => player.id === state.playerId) ?? state.snapshot.players[0]; const visualScale = Math.max(.55, Math.min(1, Math.min(window.innerWidth / 1050, window.innerHeight / 720))); const scale = visualScale / PIXEL_SCALE; const shake = me?.dashing ? 2 : 0; const ox = Math.round(width / 2 - (me?.x ?? state.snapshot.width / 2) * scale + (Math.random() - .5) * shake); const oy = Math.round(height / 2 - (me?.y ?? state.snapshot.height / 2) * scale + (Math.random() - .5) * shake);
     context.save(); context.translate(ox, oy); context.scale(scale, scale); drawArena(state.snapshot);
     for (const item of state.snapshot.environment) drawEnvironment(item);
     for (const dot of state.snapshot.dots) drawDot(dot.x, dot.y);
     if (state.snapshot.objective) drawObjective(state.snapshot.objective.x, state.snapshot.objective.y, state.snapshot.objective.health / state.snapshot.objective.maxHealth);
     for (const powerUp of state.snapshot.powerUps) drawPowerUp(powerUp.x, powerUp.y, powerUp.kind);
-    for (const bullet of state.snapshot.bullets) { context.save(); context.translate(Math.round(bullet.x), Math.round(bullet.y)); context.rotate(Math.round(bullet.angle / (Math.PI / 4)) * (Math.PI / 4)); context.fillStyle = '#fff7c2'; context.fillRect(-3, -3, 10, 6); context.fillStyle = colorValues[bullet.color]; context.fillRect(-7, -2, 4, 4); context.restore(); }
+    for (const bullet of state.snapshot.bullets) { const direction = direction8(bullet.angle); const bx = Math.round(bullet.x); const by = Math.round(bullet.y); context.fillStyle = colorValues[bullet.color]; context.fillRect(bx - direction.x * 5 - 3, by - direction.y * 5 - 3, 6, 6); context.fillStyle = '#fff7c2'; context.fillRect(bx - 3, by - 3, 7, 7); context.fillStyle = '#ffffff'; context.fillRect(bx, by - 2, 3, 3); }
     for (const player of state.snapshot.players) drawTank(player);
     updateParticles(); context.restore();
   }
@@ -102,12 +103,13 @@ function drawEnvironment(item: ArenaSnapshot['environment'][number]) {
 }
 function drawObjective(x: number, y: number, health: number) { context.fillStyle = '#8d552f'; context.fillRect(x - 58, y - 32, 116, 64); context.fillStyle = '#e8bd69'; context.fillRect(x - 52, y - 27, 104, 54); for (const tower of [-42, 0, 42]) { context.fillRect(x + tower - 13, y - 51, 26, 28); context.fillStyle = '#8d552f'; context.fillRect(x + tower - 13, y - 54, 7, 8); context.fillRect(x + tower + 6, y - 54, 7, 8); context.fillStyle = '#e8bd69'; } context.fillStyle = '#361a18'; context.fillRect(x - 50, y + 39, 100, 8); context.fillStyle = '#ffd85c'; context.fillRect(x - 50, y + 39, 100 * health, 8); }
 function drawPowerUp(x: number, y: number, kind: string) { context.fillStyle = '#fff'; context.fillRect(x - 16, y - 16, 32, 32); context.fillStyle = '#4de8e8'; context.fillRect(x - 12, y - 12, 24, 24); context.fillStyle = '#07101a'; context.font = 'bold 12px monospace'; context.textAlign = 'center'; context.fillText(kind[0].toUpperCase(), x, y + 5); }
+function direction8(angle: number) { const index = (Math.round(angle / (Math.PI / 4)) + 8) % 8; return [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }, { x: -1, y: 1 }, { x: -1, y: 0 }, { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 }][index]; }
 function drawTank(player: PlayerSnapshot) {
-  if (player.respawnIn) return; const color = colorValues[player.color]; const x = Math.round(player.x); const y = Math.round(player.y); const turretAngle = Math.round(player.angle / (Math.PI / 4)) * (Math.PI / 4);
+  if (player.respawnIn) return; const color = colorValues[player.color]; const x = Math.round(player.x); const y = Math.round(player.y); const turret = direction8(player.angle);
   context.save(); context.globalAlpha = player.concealed && player.id !== state.playerId ? .48 : 1; context.translate(x, y); if (player.dashing) { context.fillStyle = '#ffffff'; context.fillRect(-28 - Math.sign(player.vx) * 8, -14, 8, 6); context.fillRect(-30 - Math.sign(player.vx) * 5, 7, 6, 5); }
   context.fillStyle = '#080b12'; context.fillRect(-18, -15, 36, 7); context.fillRect(-18, 8, 36, 7); context.fillStyle = '#596273'; for (let track = -14; track <= 10; track += 8) { context.fillRect(track, -13, 5, 3); context.fillRect(track, 10, 5, 3); }
   context.fillStyle = color; context.fillRect(-15, -9, 30, 18); context.fillStyle = '#101827'; context.fillRect(-9, -6, 18, 12); context.fillStyle = '#e8edf5'; context.fillRect(-4, -3, 8, 6);
-  context.rotate(turretAngle); context.fillStyle = color; context.fillRect(-5, -5, 27, 10); context.fillStyle = '#fff'; context.fillRect(18, -3, 8, 6); context.restore();
+  context.fillStyle = '#101827'; context.fillRect(-6, -6, 12, 12); context.fillStyle = color; for (let step = 1; step <= 4; step += 1) context.fillRect(turret.x * step * 5 - 4, turret.y * step * 5 - 4, 8, 8); context.fillStyle = '#fff7c2'; context.fillRect(turret.x * 23 - 3, turret.y * 23 - 3, 7, 7); context.restore();
   if (player.staggeredIn) { context.fillStyle = '#ffd85c'; context.fillRect(x - 13, y - 33, 6, 6); context.fillRect(x + 5, y - 37, 6, 6); }
   if (player.shielded) { context.strokeStyle = '#7ffcff'; context.lineWidth = 3; context.strokeRect(x - 25, y - 24, 50, 48); }
   context.textAlign = 'center'; context.font = 'bold 11px monospace'; context.fillStyle = '#f4f7ff'; context.fillText(`${player.name} L${player.level}`, x, y - 29); context.fillStyle = '#3b1423'; context.fillRect(x - 25, y + 22, 50, 5); context.fillStyle = color; context.fillRect(x - 25, y + 22, Math.max(0, 50 * player.health / player.maxHealth), 5);
