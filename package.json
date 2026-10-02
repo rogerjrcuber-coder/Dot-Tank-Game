@@ -1,7 +1,7 @@
 {
   "name": "dot-tank-arena",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"tsx server/index.ts\"",

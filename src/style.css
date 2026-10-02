@@ -51,12 +51,12 @@ input:focus { border-color:var(--cyan); }
 .touch-ui .game { touch-action:none; user-select:none; }
 .touch-ui .mobile-controls { display:block; position:absolute; inset:0; pointer-events:none; }
 .touch-ui .stick,.touch-ui .aim-stick,.touch-ui .dash { pointer-events:auto; touch-action:none; position:absolute; background:#0009; color:#fff; border:3px solid; box-shadow:4px 4px 0 #0009; }
-.touch-ui .stick,.touch-ui .aim-stick { bottom:max(18px,env(safe-area-inset-bottom)); width:108px; height:108px; }
+.touch-ui .stick,.touch-ui .aim-stick { bottom:calc(env(safe-area-inset-bottom) + 46px); width:108px; height:108px; }
 .touch-ui .stick { left:max(18px,env(safe-area-inset-left)); border-color:var(--cyan); }.touch-ui .aim-stick { right:max(18px,env(safe-area-inset-right)); border-color:var(--violet); }
 .touch-ui .stick i,.touch-ui .aim-stick i { display:block; position:absolute; left:50%; top:50%; width:26px; height:26px; margin:-13px; will-change:transform; }
 .touch-ui .stick i { background:var(--cyan); }.touch-ui .aim-stick i { background:var(--violet); }
 .touch-ui .stick::after,.touch-ui .aim-stick::after { position:absolute; left:0; right:0; bottom:8px; text-align:center; font-size:6px; color:#fff; text-shadow:2px 2px 0 #000; }.touch-ui .stick::after { content:"MOVE"; }.touch-ui .aim-stick::after { content:"AIM + AUTO"; }
-.touch-ui .dash { right:max(138px,calc(env(safe-area-inset-right) + 138px)); bottom:max(31px,calc(env(safe-area-inset-bottom) + 13px)); width:58px; height:58px; border-color:var(--yellow); font-size:7px; }
+.touch-ui .dash { right:max(138px,calc(env(safe-area-inset-right) + 138px)); bottom:calc(env(safe-area-inset-bottom) + 59px); width:58px; height:58px; border-color:var(--yellow); font-size:7px; }
 .touch-ui .auto-fire,.touch-ui .status,.touch-ui .kill-feed,.touch-ui .minimap,.touch-ui .event,.touch-ui .power,.touch-ui .rules,.touch-ui .brand,.touch-ui .leaderboard { display:none; }
 .touch-ui .hud { padding:0; }.touch-ui .hud-left { width:auto; }.touch-ui .dash-meter { position:absolute; top:max(10px,env(safe-area-inset-top)); left:50%; transform:translateX(-50%); width:96px; margin:0; padding:5px; border-width:3px; box-shadow:3px 3px 0 #0009; }.touch-ui .dash-meter b { font-size:6px; margin-bottom:4px; }.touch-ui .dash-meter i { height:6px; }
 @media (max-width:700px) {
